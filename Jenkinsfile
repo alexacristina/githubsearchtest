@@ -16,7 +16,7 @@ pipeline {
 
         stage ('UnitTests') {
             steps {
-                bat returnStatus: true, script: "\"C:/Program Files/dotnet/dotnet.exe\" test \"${workspace}/TestSearchRepoQueries/TestSearchRepoQueries.sln\" --filter \"TestCategory=category\" --logger \"nunit;LogFileName=unit_tests.xml\" --no-build"
+                bat returnStatus: true, script: "\"C:/Program Files/dotnet/dotnet.exe\" test \"${workspace}/TestSearchRepoQueries/TestSearchRepoQueries.sln\" --logger \"nunit;LogFileName=unit_tests.xml\" --no-build"
                 script {
                     nunit testResultsPattern: 'TestSearchRepoQueries/TestSearchRepoQueries/TestResults/unit_tests.xml', failedTestsFailBuild: true
                 }
