@@ -18,7 +18,7 @@ pipeline {
             steps {
                 bat returnStatus: true, script: "\"C:/Program Files/dotnet/dotnet.exe\" test \"${workspace}/TestSearchRepoQueries/TestSearchRepoQueries.sln\" --logger \"trx;LogFileName=unit_tests.xml\" --no-build"
                 script {
-                    [$class: "nunit", testResultsPattern: "**/unit_tests.xml", failIfNoResults: true, failedTestsFailBuild: true]
+                    nunit testResultsPattern: '**/unit_tests.xml', failedTestsFailBuild: true
                 }
             }
         }
