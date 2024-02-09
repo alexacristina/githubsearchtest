@@ -35,6 +35,7 @@ To trigger builds for a branch manually in Jenkins, follow these steps:
 3. **Initiate the Build**:
    - Look for the "Build Now" or "Run" button. It may be located near the branch name or within the branch details page.
    - Click on the "Build Now" or "Run" button to manually trigger the build for the selected branch.
+   - Jenkins will automatically trigger build for the selected branch based on the Jenkinsfile present in the repository.
 
 4. **Monitor the Build Progress**:
    - Once the build is triggered, Jenkins will start executing the pipeline for the selected branch.
