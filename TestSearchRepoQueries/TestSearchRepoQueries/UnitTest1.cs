@@ -21,8 +21,8 @@ public class Repository
     public string? NodeId {get; set;}
     [JsonProperty("full_name")]
     public string? FullName {get; set;}
-
-    
+    [JsonProperty("star_gazers")]
+    public int StarGazers {get; set; }    
 }
 
 public class RepositoriesResult
@@ -107,7 +107,7 @@ public class Tests
 
         Assert.NotNull(repositoriesResult);
 
-        Assert.That(repositoriesResult.TotalCount, Is.EqualTo(4588));
+        Assert.That(repositoriesResult.TotalCount, Is.EqualTo(4592));
     }
 
     [Test]
@@ -135,10 +135,86 @@ public class Tests
 
         Assert.NotNull(repositoriesResult.Repositories);
 
-        Trace.WriteLine(repositoriesResult.Repositories.Count());
-        repositoriesResult.Repositories.ForEach(_ => 
-            Trace.WriteLine(string.Join(" ", _.FullName, _.PushedAt.ToLongDateString())));
+        // Trace.WriteLine(repositoriesResult.Repositories.Count());
+        // repositoriesResult.Repositories.ForEach(_ => 
+        //     Trace.WriteLine(string.Join(" ", _.FullName, _.PushedAt.ToLongDateString())));
         
         Assert.That(repositoriesResult.Repositories, Is.Ordered.By("PushedAt"));
+    }
+
+    [Test]
+    public void UserSpecificRepositoriesFetch()
+    {
+        RestRequest request = new RestRequest(EndPointAddress.EndPointUri, Method.Get);
+        request.AddHeader("Accept", "application/vnd.github+json");
+
+        request.AddParameter("q", "user:alexacristina");
+
+        RestResponse response = EndPointAddress.Instance.Client.Execute(request);
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        
+        var jsonSerializerSettings = new JsonSerializerSettings();
+        jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+        Assert.NotNull(response.Content);
+        var repositoriesResult = JsonConvert.DeserializeObject<RepositoriesResult>(response.Content, jsonSerializerSettings);
+
+        Assert.NotNull(repositoriesResult);
+
+        Assert.That(repositoriesResult.TotalCount, Is.EqualTo(10));
+        
+    }
+
+    [Test]
+    public void TetrisInNameRepositoriesFetch()
+    {
+        RestRequest request = new RestRequest(EndPointAddress.EndPointUri, Method.Get);
+        request.AddHeader("Accept", "application/vnd.github+json");
+
+        request.AddParameter("q", "tetris in:name language:csharp");
+        request.AddParameter("sort", "stars");
+        request.AddParameter("order", "desc" );
+
+        RestResponse response = EndPointAddress.Instance.Client.Execute(request);
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        
+        var jsonSerializerSettings = new JsonSerializerSettings();
+        jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+        Assert.NotNull(response.Content);
+        var repositoriesResult = JsonConvert.DeserializeObject<RepositoriesResult>(response.Content, jsonSerializerSettings);
+
+        Assert.NotNull(repositoriesResult);
+
+        Assert.NotNull(repositoriesResult.Repositories);
+        Assert.That(repositoriesResult.Repositories, Is.Ordered.By("StarGazers"));        
+    }
+
+
+     [Test]
+    public void Count100PerPageRepoResults()
+    {
+        RestRequest request = new RestRequest(EndPointAddress.EndPointUri, Method.Get);
+        request.AddHeader("Accept", "application/vnd.github+json");
+
+        request.AddParameter("q", "tetris in:name language:javascript language:csharp");
+        request.AddParameter("per_page", "100" );
+
+        RestResponse response = EndPointAddress.Instance.Client.Execute(request);
+
+        Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        
+        var jsonSerializerSettings = new JsonSerializerSettings();
+        jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+
+        Assert.NotNull(response.Content);
+        var repositoriesResult = JsonConvert.DeserializeObject<RepositoriesResult>(response.Content, jsonSerializerSettings);
+
+        Assert.NotNull(repositoriesResult);
+
+        Assert.NotNull(repositoriesResult.Repositories);
+        Assert.That(repositoriesResult.Repositories.Count(), Is.EqualTo(100));        
     }
 }
